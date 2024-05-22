@@ -1,0 +1,222 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HAPPY BIRTHDAY BABY</title>
+    <style>
+        body {
+            font-family:Impact, Haettenschweiler, 'Arial Narrow Bold', sans-serif;
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 400px;
+            background-size:inherit;
+            background-image: url("today.jpeg");
+            
+        }
+
+        header {
+            background-color: #4CAF50;
+            color: white;
+            padding: 1rem;
+            text-align: center;
+        }
+
+        main {
+            padding: 2rem;
+            background-color: rgba(255, 255, 255, 0.8);
+            margin: 2rem auto;
+            border-radius: 20px;
+            width: 80%;
+            box-shadow: 0 0 20px rgba(0, 0, 0, 0.1);
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-bottom: 2rem;
+            
+            
+        }
+
+        th, td {
+            padding: 2rem;
+            border: 1px solid #ddd;
+            text-align: left;
+            
+        }
+
+        th {
+            background-color: #f2f2f2;
+        }
+
+        button {
+            padding: 0.5rem 1rem;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            cursor: pointer;
+            border: 2px solid rgb(0, 0, 0);
+            border-radius: 20px;
+            padding: px;
+        }
+
+        button:hover {
+            background-color: #45a049;
+        }
+
+        #event-details {
+            background-color: rgb(255, 255, 255);
+            border: 1px solid #ddd;
+            padding: 1rem;
+            position: fixed;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 1000;
+            width: 300px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: px;
+        }
+
+        #event-details.hidden {
+            display: none;
+        }
+
+        #event-details h2 {
+            margin-top: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>H A P P Y  B I R T H D A Y  M Y  B A B Y  B O O  !!</h1>
+    </header>
+    <main>
+        <table id="schedule">
+            <thead>
+                <tr>
+                    <th>Day</th>
+                    <th>Time</th>
+                    <th>Event</th>
+                    <th>Details</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td>Day 1</td>
+                    <td>9:00PM - 12:00PM</td>
+                    <td>Street Food Hunting</td>
+                    <td><button onclick="showDetails('day1-event1')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td>Day 2</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>10.00AM - 12:00PM</td>
+                    <td>Pick Sayang Up</td>
+                    <td><button onclick="showDetails('day2-event1')">Click me baby!</button></td>
+                <tr>
+                    <td></td>
+                    <td>12.00PM - 4:00PM</td>
+                    <td>Going to dinner</td>
+                    <td><button onclick="showDetails('day2-event2')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>5.00PM - 7:00PM</td>
+                    <td>Dinner</td>
+                    <td><button onclick="showDetails('day2-event3')">Click me baby!</button></td>
+                </tr>
+                </tr>
+                <tr>
+                    <td>Day 3</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>5:30PM - 6:00PM</td>
+                    <td>Pick Sayang Up hehe</td>
+                    <td><button onclick="showDetails('day3-event1')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>6.00PM - 8.00PM</td>
+                    <td>We are going for scenery</td>
+                    <td><button onclick="showDetails('day3-event2')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>9.00PM - 10:00PM</td>
+                    <td>REST!!</td>
+                    <td><button onclick="showDetails('day3-event3')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td>Day 4</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>10.00AM - 10:00PM</td>
+                    <td>Main Event!!</td>
+                    <td><button onclick="showDetails('day4-event1')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>11:00PM-12:00PM</td>
+                    <td>Dinner</td>
+                    <td><button onclick="showDetails('day4-event2')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td>Day 5</td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>10:30AM - 6:00PM</td>
+                    <td>Tourist Date</td>
+                    <td><button onclick="showDetails('day5-event1')">Click me baby!</button></td>
+                </tr>
+                <tr>
+                    <td></td>
+                    <td>6:00PM - 7:00PM</td>
+                    <td>Going Back</td>
+                    <td><button onclick="showDetails('day5-event2')">Click me baby!</button></td>
+                </tr>
+            </tbody>
+        </table>
+    </main>
+    <div id="event-details" class="hidden">
+        <h2>Event Details</h2>
+        <p id="details-content"></p>
+        <button onclick="hideDetails()">Close</button>
+    </div>
+    <script>
+        const eventDetails = {
+            "day1-event1": "reminiscence our good old day where we love street food and having a decent talk hehe",
+            "day2-event1": "BABY NEED TO WEAR : BLACK DRESS WITH HEELS",
+            "day2-event2": "We go and buy shirt for Day 3",
+            "day2-event3": "We are going for our dinner, BABY NEED TO WEAR : BLACK DRESS WITH HEELS, need to close your eyes with towel hehe",
+            "day3-event1": "Wear something Cozy and comfortable hehe",
+            "day3-event2": "it will be relaxing, because tomorrow will be crazyss ",
+            "day3-event3": "Need to restttttt!!!",
+            "day4-event1": "The theme is something extra, with an outerwear, the event will make us sweat and scream",
+            "day4-event2": "We go for tomyam set, both of us",
+            "day5-event1": "We are going to your favourite fruit place, my pretty passenger can sleep in the car in return need to smile once arrived",
+            "day5-event2": "We going back :(("
+        };
+
+        function showDetails(eventId) {
+            const detailsContent = document.getElementById('details-content');
+            detailsContent.innerText = eventDetails[eventId];
+            const detailsDiv = document.getElementById('event-details');
+            detailsDiv.classList.remove('hidden');
+        }
+
+        function hideDetails() {
+            const detailsDiv = document.getElementById('event-details');
+            detailsDiv.classList.add('hidden');
+        }
+    </script>
+</body>
+</html>

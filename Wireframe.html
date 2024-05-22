@@ -1,0 +1,179 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>Portfolio</title>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+</head>
+<style>
+    html, body {
+        margin: 0;
+        padding: 0;
+        width: 100%;
+        height: 100%;
+        overflow: hidden;
+        background-color: black;
+    }
+
+    canvas {
+        display: block;
+    }
+</style>
+<body>
+
+<script type="module">
+    import * as THREE from 'https://cdn.skypack.dev/three@0.131.2/build/three.module.js';
+    import { GLTFLoader } from 'https://cdn.skypack.dev/three@0.131.2/examples/jsm/loaders/GLTFLoader.js';
+    import { OrbitControls } from 'https://cdn.skypack.dev/three@0.131.2/examples/jsm/controls/OrbitControls.js';
+    import { OutlineEffect } from 'https://cdn.skypack.dev/three@0.131.2/examples/jsm/effects/OutlineEffect.js';
+
+    let camera, scene, renderer, controls, mixer, outlineEffect, leftEyeSkeleton, rightEyeSkeleton;
+
+    init();
+    animate();
+
+    function init() {
+        // Load background texture
+        const textureLoader = new THREE.TextureLoader();
+        const backgroundTexture = textureLoader.load('Amatic SC.png');
+
+        // Create scene
+        scene = new THREE.Scene();
+        scene.background = backgroundTexture;
+
+        // Create ambient light
+        const ambientLight = new THREE.AmbientLight(0xffffff, 0.8);
+        scene.add(ambientLight);
+
+        // Create directional light
+        const directionalLight = new THREE.DirectionalLight(0xffffff, 1.0);
+        directionalLight.position.set(3, 10, 4);
+        scene.add(directionalLight);
+
+        // Load the GLTF model
+        const gltfLoader = new GLTFLoader();
+        gltfLoader.load(
+            'me.glb',
+            function (gltf) {
+                // Access the skeletons from the loaded model
+                leftEyeSkeleton = new THREE.SkeletonHelper(gltf.scene.getObjectByName('LeftEye'));
+                rightEyeSkeleton = new THREE.SkeletonHelper(gltf.scene.getObjectByName('RightEye'));
+
+                //scene.add(leftEyeSkeleton);
+                //scene.add(rightEyeSkeleton);
+
+                // Center the object
+                const object = gltf.scene;
+                const box = new THREE.Box3().setFromObject(object);
+                const center = box.getCenter(new THREE.Vector3());
+                center.y += 0.6;
+                object.position.sub(center);
+
+                // Add the object to the scene
+                scene.add(object);
+
+                // Get the animations from the GLTF file
+                mixer = new THREE.AnimationMixer(object);
+                gltf.animations.forEach((clip) => {
+                    const action = mixer.clipAction(clip);
+                    action.play();
+                });
+
+                // Create perspective camera
+                camera = new THREE.PerspectiveCamera(5, window.innerWidth / window.innerHeight, 0.7, 100);
+                camera.position.set(0, 3.5, 10);
+
+                // Create renderer
+                renderer = new THREE.WebGLRenderer({ antialias: true });
+                renderer.setPixelRatio(window.devicePixelRatio);
+                renderer.setSize(window.innerWidth, window.innerHeight);
+                document.body.appendChild(renderer.domElement);
+
+                // Create OrbitControls
+                controls = new OrbitControls(camera, renderer.domElement);
+                controls.enableDamping = true;
+                controls.dampingFactor = 0.05;
+                controls.rotateSpeed = 0.5;
+                controls.zoomSpeed = 1.2;
+
+                // Create OutlineEffect
+                outlineEffect = new OutlineEffect(renderer);
+
+                // Resize handling
+                window.addEventListener('resize', onWindowResize);
+
+                // Add a pointermove event listener to update the eyes' rotation on both mouse and touch events
+                window.addEventListener('pointermove', onPointerMove);
+            },
+            undefined, // onProgress callback
+            function (error) {
+                console.error('Error loading GLTF model:', error);
+            }
+        );
+    }
+
+    function onWindowResize() {
+        const aspectRatio = window.innerWidth / window.innerHeight;
+        camera.aspect = aspectRatio;
+
+        const initialFOV = 70;
+        const verticalFOV = initialFOV / aspectRatio;
+
+        camera.fov = verticalFOV;
+        camera.updateProjectionMatrix();
+
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        outlineEffect.setSize(window.innerWidth, window.innerHeight);
+    }
+
+    function onPointerMove(event) {
+        let mouseX, mouseY;
+
+        if (event.changedTouches) {
+            // For touch events
+            mouseX = (event.changedTouches[0].clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.changedTouches[0].clientY / window.innerHeight) * 2 + 1;
+        } else {
+            // For mouse events
+            mouseX = (event.clientX / window.innerWidth) * 2 - 1;
+            mouseY = -(event.clientY / window.innerHeight) * 2 + 1;
+        }
+
+        // Create a vector representing the pointer position in 3D space
+        const pointerVector = new THREE.Vector3(mouseX, mouseY, 0.5);
+        pointerVector.unproject(camera);
+
+        // Calculate the direction from the camera to the pointer position
+        const direction = pointerVector.sub(camera.position).normalize();
+
+        // Rotate the skeletons to look at the pointer position
+        if (leftEyeSkeleton && rightEyeSkeleton) {
+            rotateSkeletonToLookAt(leftEyeSkeleton, direction);
+            rotateSkeletonToLookAt(rightEyeSkeleton, direction);
+        }
+    }
+
+    function rotateSkeletonToLookAt(skeleton, targetDirection) {
+        if (skeleton && skeleton.bones.length > 0) {
+            const lookAtMatrix = new THREE.Matrix4().lookAt(camera.position, targetDirection, camera.up);
+            const rotationMatrix = new THREE.Matrix4().extractRotation(lookAtMatrix);
+            skeleton.bones[0].setRotationFromMatrix(rotationMatrix);
+        }
+    }
+
+    function animate() {
+        requestAnimationFrame(animate);
+
+        // Update controls and mixer
+        controls.update();
+        if (mixer) {
+            mixer.update(0.016);
+        }
+
+        // Render the scene with the OutlineEffect
+        outlineEffect.render(scene, camera);
+    }
+</script>
+
+</body>
+</html>
